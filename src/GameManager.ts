@@ -1,5 +1,5 @@
 import { WebSocket } from "ws";
-import { INFO, INIT_GAME, MOVE } from "./messages";
+import { INIT_GAME, MOVE, PENDING } from "./messages";
 import { Game } from "./Game";
 
 export class GameManager {
@@ -36,15 +36,12 @@ export class GameManager {
           this.pendingUser = socket;
           socket.send(
             JSON.stringify({
-              type: INFO,
+              type: PENDING,
               payload: "Pending user",
             })
           );
         }
       }
-
-      console.log("message.type");
-      console.log(message.type);
 
       if (message.type === MOVE) {
         const game = this.games.find(
