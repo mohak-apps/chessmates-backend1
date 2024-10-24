@@ -1,20 +1,10 @@
-import { WebSocketServer } from "ws";
-import { GameManager } from "./GameManager";
+import { startWebSocketServer } from "./websocket-server";
+import { startHttpServer } from "./http-server";
 
-const port = 8080;
-const wss = new WebSocketServer({ port: port });
-const gameManager = new GameManager();
+require("dotenv").config();
 
-wss.on("listening", () => {
-  console.log(`WebSocket server is listening on port ${port}`);
-});
+const WS_PORT = process.env.WS_PORT || 8080;
+const HTTP_PORT = process.env.HTTP_PORT || 3000;
 
-wss.on("connection", function connection(ws) {
-  console.log("connection successful");
-  gameManager.addUser(ws);
-});
-
-wss.on("disconnect", (ws) => {
-  console.log("connection successful");
-  gameManager.removeUser(ws);
-});
+startWebSocketServer(WS_PORT);
+startHttpServer(HTTP_PORT);
