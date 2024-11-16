@@ -42,9 +42,33 @@ export interface Achievement {
 
 export interface GameSession {
   id: string;
-  players: GameUser[];
+  playerIds: string[];
   startTime: Date;
-  endTime?: Date;
-  result?: "win" | "loss" | "draw";
-  gameType: "casual" | "ranked";
+  endTime?: Date | null;
+  result?: GameResult | null;
+  gameType: GameType;
+}
+
+export enum GameResult {
+  Win = "win",
+  Loss = "loss",
+  Draw = "draw",
+  InProgress = "in progress",
+}
+
+export enum GameType {
+  Practice = "practice",
+  Ranked = "ranked",
+}
+
+export enum AuthMethods {
+  local = "local",
+  google = "google",
+}
+
+export enum GameState {
+  LOADING = "loading",
+  PENDING = "pending",
+  STARTED = "started",
+  ENDED = "ended",
 }

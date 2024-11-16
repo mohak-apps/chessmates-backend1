@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  authMethods String[]
+  email       String   @unique(map: "email_1")
+  googleId    String?
+  image       String?
+  name        String
+  password    String?
+  gameIds     String[] @db.ObjectId
+
+  @@map("users") //db collection users is created for User
+}
+
+model GameSession {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  whitePlayerId String     @db.ObjectId
+  blackPlayerId String     @db.ObjectId
+  startTime     DateTime
+  endTime       DateTime?
+  result        String?
+  gameType      String
+  moves         GameMove[] // This creates a one-to-many relationship with Move
+
+  @@map("games") //db collection games is created for User
+}
+
+model GameMove {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  gameSessionId String      @unique @db.ObjectId
+  moveNumber    Int
+  whiteMoves    String[]
+  blackMoves    String[]
+  timestamp     DateTime    @default(now())
+  gameSession   GameSession @relation(fields: [gameSessionId], references: [id])
+
+  @@unique([gameSessionId, moveNumber]) //compound unique identifier
+  @@map("moves")
+}

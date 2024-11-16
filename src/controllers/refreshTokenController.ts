@@ -7,9 +7,6 @@ require("dotenv").config();
 export const refreshToken = (req: Request, res: Response) => {
   const refreshToken = req.cookies.refreshToken; // Extract from cookie
 
-  console.log("refreshToken");
-  console.log(refreshToken);
-  
   if (!refreshToken) {
     return res.status(403).json({ message: "No refresh token provided" });
   }

@@ -1,16 +1,14 @@
 import express from "express";
 import authRouter from "./routes/authRouter";
-import dbConn from "./models/dbConnection";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import gameRouter from "./routes/gameRouter";
 
 export function startHttpServer(port: any) {
   const app = express();
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser()); // Use cookie-parser middleware
-
-  dbConn();
 
   app.use(
     cors({
@@ -28,4 +26,5 @@ export function startHttpServer(port: any) {
   });
 
   app.use("/auth", authRouter);
+  app.use("/game", gameRouter);
 }

@@ -1,15 +1,24 @@
 import { Chess } from "chess.js";
 import { WebSocket } from "ws";
-import { GAME_OVER, INIT_GAME, MOVE } from "./messages";
+import { GAME_OVER, INIT_GAME, MOVE, TURN } from "./messages";
+import { User } from "./types";
 
 export class Game {
+  public gameId: string;
   public player1: WebSocket;
   public player2: WebSocket;
   private board: Chess;
   private startTime: Date;
   private moveCount: number;
 
-  constructor(player1: WebSocket, player2: WebSocket) {
+  constructor(
+    gameId: string,
+    player1: WebSocket,
+    player2: WebSocket,
+    p1: User,
+    p2: User
+  ) {
+    this.gameId = gameId;
     this.player1 = player1;
     this.player2 = player2;
     this.moveCount = 0;
@@ -20,7 +29,10 @@ export class Game {
       JSON.stringify({
         type: INIT_GAME,
         payload: {
+          gameId,
           color: "white",
+          opponent: p2,
+          turn: true,
         },
       })
     );
@@ -28,7 +40,10 @@ export class Game {
       JSON.stringify({
         type: INIT_GAME,
         payload: {
+          gameId,
           color: "black",
+          opponent: p1,
+          turn: false,
         },
       })
     );
@@ -72,12 +87,24 @@ export class Game {
     }
 
     if (this.moveCount % 2 === 0) {
-      // if player 1 plays, send that move to player 2
+      // if player 1 plays, send that move to player 2 and set turn
       console.log("player 1 played");
       this.player2.send(
         JSON.stringify({
           type: MOVE,
-          payload: move,
+          payload: { move: move },
+        })
+      );
+      this.player2.send(
+        JSON.stringify({
+          type: TURN,
+          payload: { move: move, turn: true },
+        })
+      );
+      this.player1.send(
+        JSON.stringify({
+          type: TURN,
+          payload: { move: move, turn: false },
         })
       );
     } else {
@@ -85,7 +112,19 @@ export class Game {
       this.player1.send(
         JSON.stringify({
           type: MOVE,
-          payload: move,
+          payload: { move: move },
+        })
+      );
+      this.player1.send(
+        JSON.stringify({
+          type: TURN,
+          payload: { move: move, turn: true },
+        })
+      );
+      this.player2.send(
+        JSON.stringify({
+          type: TURN,
+          payload: { move: move, turn: false },
         })
       );
     }
